@@ -22,6 +22,7 @@ get '/' do
 end
 
 get '/analyse' do
+  @basename = File.basename(params[:f])
   @anal = NER::FreeLing::Analyzer.new(open(params[:f]))                                                                                                                            
   @sentences = @anal.sentences
   erb :analyse

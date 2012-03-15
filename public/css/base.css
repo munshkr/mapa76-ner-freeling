@@ -3,9 +3,9 @@ body {
 }
 
 article p {
-  line-height: 26px;
+  line-height: 28px;
+  font-size: 14px;
 }
-
 .ned {
   background-color: gray;
   color: white;
@@ -25,7 +25,25 @@ article p {
 }
 .ned.places {
   background-color: yellow;
+  color: black;
 }
 .ned.date {
   background-color: green;
+}
+.block {
+  display: inline-block;
+  width: 8px;
+  height: 10px;
+}
+
+ul.inline {
+  margin-left: 0;
+  list-style-type: none;
+}
+ul.inline li {
+  display: inline;
+}
+
+aside {
+  margin: 30px 0;
 }
