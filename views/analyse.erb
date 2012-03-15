@@ -1,0 +1,14 @@
+<h1>Entrenamiento</h1>
+<p>lorem ipsum</p>
+
+<% if @sentences %>
+<article>
+  <% @sentences.each do |sentence| %>
+    <p>
+      <% sentence.each do |token| %>
+        <span class="<%= "ned #{token.class}" if token.named_entity? or token.date? %>"><%= token.form %></span>
+      <% end %>
+    </p>
+  <% end %>
+</article>
+<% end %>
