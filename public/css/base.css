@@ -6,7 +6,7 @@ body {
   line-height: 28px;
   font-size: 14px;
 }
-.tokens span {
+.tk {
   cursor: pointer;
   padding: 3px 4px;
   margin: 0 -3px;
@@ -14,28 +14,28 @@ body {
   -moz-border-radius: 3px;
   -webkit-border-radius: 3px;
 }
-.tokens span:hover {
+.tk:hover {
   color: #000;
   background-color: #eee;
 }
-.ned {
+.ne {
   color: white;
   background-color: gray;
 }
-.ned.people {
+.ne.people {
   background-color: red;
 }
-.ned.organizations {
+.ne.organizations {
   background-color: blue;
 }
-.ned.others {
+.ne.others {
   background-color: #aaa;
 }
-.ned.places {
+.ne.places {
   color: black;
   background-color: yellow;
 }
-.ned.date {
+.ne.date {
   background-color: green;
 }
 
