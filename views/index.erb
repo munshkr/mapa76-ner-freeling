@@ -1,8 +1,8 @@
 <h1>Documentos para analisar</h1>
 <% if @files %>
 <ul>
-  <% @files.each do |basename, path| %>
-    <li><a href="/analyse?f=<%=h path %>"><%= basename %></a></li>
+  <% @files.each do |filename| %>
+    <li><a href="/analyse?f=<%=h filename %>"><%= filename %></a></li>
   <% end %>
 </ul>
 <% end %>

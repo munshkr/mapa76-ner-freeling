@@ -2,17 +2,25 @@ body {
   padding-top: 60px; /* 60px to make the container go all the way to the bottom of the topbar */
 }
 
-article p {
+.tokens p {
   line-height: 28px;
   font-size: 14px;
 }
-.ned {
-  background-color: gray;
-  color: white;
+.tokens span {
+  cursor: pointer;
   padding: 3px 4px;
+  margin: 0 -3px;
   border-radius: 3px;
   -moz-border-radius: 3px;
   -webkit-border-radius: 3px;
+}
+.tokens span:hover {
+  color: #000;
+  background-color: #eee;
+}
+.ned {
+  color: white;
+  background-color: gray;
 }
 .ned.people {
   background-color: red;
@@ -21,15 +29,16 @@ article p {
   background-color: blue;
 }
 .ned.others {
-  background-color: black;
+  background-color: #aaa;
 }
 .ned.places {
-  background-color: yellow;
   color: black;
+  background-color: yellow;
 }
 .ned.date {
   background-color: green;
 }
+
 .block {
   display: inline-block;
   width: 8px;

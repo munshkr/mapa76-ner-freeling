@@ -5,7 +5,11 @@ require 'rubygems'
 require 'bundler/setup'
 require 'sinatra'
 
-require 'ner/freeling/analyzer'
+$LOAD_PATH << './lib'
+
+require 'document'
+
+DOCUMENTS_PATH = File.join(settings.public_folder, 'docs')
 
 
 helpers do
@@ -15,16 +19,14 @@ end
 
 
 get '/' do
-  @files = Hash[Dir["#{settings.public_folder}/docs/*.txt"].sort.map { |path|
-    [File.basename(path), path]
-  }]
+  @files = Dir[File.join(DOCUMENTS_PATH, '*.txt')].sort.map do |path|
+    File.basename(path)
+  end
   erb :index
 end
 
 get '/analyse' do
-  @basename = File.basename(params[:f])
-  @anal = NER::FreeLing::Analyzer.new(open(params[:f]))                                                                                                                            
-  @sentences = @anal.sentences
+  @document = Document.new(open(File.join(DOCUMENTS_PATH, params[:f])).read)
   erb :analyse
 end
 

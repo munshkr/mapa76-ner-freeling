@@ -1,5 +1,5 @@
 <heading>
-  <h1>Análisis de <i><%= @basename %></i></h1>
+  <h1>Análisis de <i><%= params[:f] %></i></h1>
 </heading>
 
 <aside id="reference" class="well">
@@ -13,12 +13,12 @@
   </ul>
 </aside>
 
-<% if @sentences %>
-<article>
-  <% @sentences.each do |sentence| %>
+<% if @document %>
+<article class="tokens">
+  <% @document.tagged_sentences.each do |sentence| %>
     <p>
       <% sentence.each do |token| %>
-        <span class="<%= "ned #{token.class}" if token.named_entity? or token.date? %>"><%= token.form %></span>
+        <span class="<%= "ned #{token.class}" if token.named_entity? or token.date? %>"><%= token.form.gsub('_', ' ') %></span>
       <% end %>
     </p>
   <% end %>
