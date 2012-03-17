@@ -4,6 +4,7 @@
 require 'rubygems'
 require 'bundler/setup'
 require 'sinatra'
+require 'padrino-helpers'
 
 $LOAD_PATH << './lib'
 
@@ -12,9 +13,21 @@ require 'document'
 DOCUMENTS_PATH = File.join(settings.public_folder, 'docs')
 
 
+
 helpers do
-  include Rack::Utils
-  alias_method :h, :escape
+  register Padrino::Helpers
+
+  def tagged_document_html(document)
+    html = ''
+    cur = 0
+    document.tagged_tokens.each do |token|
+      html << document.text[cur ... token.offset]
+      token_class = (token.named_entity? or token.date?) ? "ned #{token.class}" : nil
+      html << content_tag(:span, token.orig_form, :class => token_class)
+      cur = token.offset + token.form.size
+    end
+    simple_format(html)
+  end
 end
 
 

@@ -15,8 +15,6 @@
 
 <% if @document %>
 <article class="tokens">
-  <% @document.tagged_tokens.each do |token| %>
-    <span class="<%= "ned #{token.class}" if token.named_entity? or token.date? %>"><%= token.form.gsub('_', ' ') %></span>
-  <% end %>
+  <%= tagged_document_html(@document) %>
 </article>
 <% end %>
