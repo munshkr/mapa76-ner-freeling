@@ -5,10 +5,15 @@ require 'rubygems'
 require 'bundler/setup'
 require 'sinatra'
 require 'padrino-helpers'
+require 'mongoid'
+
+Mongoid.load!(File.join(File.dirname(__FILE__), 'mongoid.yml'))
+Mongoid.logger = Logger.new($stdout)
 
 $LOAD_PATH << './lib'
 
 require 'document'
+require 'token'
 
 DOCUMENTS_PATH = File.join(settings.public_folder, 'docs')
 
