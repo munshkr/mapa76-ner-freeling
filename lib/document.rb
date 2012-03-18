@@ -6,12 +6,17 @@ class Document
   include Mongoid::Document
 
   field :text, :type => String
+  field :last_analysis, :type => Time
 
   has_many    :tokens, :dependent => :delete
   embeds_many :named_entities
 
   after_save :save_tokens
 
+
+  def analyzed?
+    !!self.last_analysis
+  end
 
   def analyze
     self.tokens.destroy_all
@@ -27,6 +32,8 @@ class Document
     named_entities_from_analyzer(self.tokens).each do |named_entity|
       self.named_entities << named_entity
     end
+
+    self.last_analysis = Time.now
   end
 
 
