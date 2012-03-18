@@ -72,9 +72,9 @@ private
 
         # exact match
         if token[:form] == st[cur_st].form
-          if Token::NE_CLASSES_PER_TAG[token[:tag]]
+          if Token.named_entity?(token)
             yielder << NamedEntity.new(token.merge({
-              :ne_class => st[cur_st].ne_class,
+              :ne_class => st[cur_st].named_entity_class,
               :pos => st[cur_st].pos,
               :tokens => [st[cur_st]],
             }))
@@ -93,9 +93,9 @@ private
             m_word = m_word.slice(st[cur_st].form.size + 1 .. -1).to_s
             cur_st += 1
           end
-          if Token::NE_CLASSES_PER_TAG[token[:tag]]
+          if Token.named_entity?(token)
             yielder << NamedEntity.new(token.merge({
-              :ne_class => Token::NE_CLASSES_PER_TAG[token[:tag]],
+              :ne_class => Token.named_entity_class(token),
               :pos => token_pos,
               :tokens => tokens,
             }))
