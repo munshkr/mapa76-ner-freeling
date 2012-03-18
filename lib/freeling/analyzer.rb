@@ -8,8 +8,8 @@ ENV['FREELINGSHARE'] = '/usr/local/share/freeling'
 
 module FreeLing
 
-  class Analyzer < ::Analyzer
-    attr_reader :last_error
+  class Analyzer
+    attr_reader :document, :last_error
 
     DEFAULT_CONFIG_PATH = '/usr/local/share/freeling/config/es.cfg'
     DEFAULT_ANALYZE_PATH = '/usr/local/bin/analyzer'
@@ -20,7 +20,7 @@ module FreeLing
 
 
     def initialize(document, opts={})
-      super(document, opts)
+      @document = document
 
       @options = {
         :config_path => DEFAULT_CONFIG_PATH,
