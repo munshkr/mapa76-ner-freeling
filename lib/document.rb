@@ -1,13 +1,18 @@
-# encoding: utf-8
 require 'freeling/analyzer'
 
-
 class Document
-  attr_reader :text
+  include Mongoid::Document
 
-  def initialize(text)
-    @text = text
-    @analyzer ||= {}
+  field :text, :type => String
+
+  has_many :tokens
+  embeds_many :named_entities
+
+=begin
+  def named_entities
+  end
+
+  def analyze
   end
 
   # Return an array of tokens.
@@ -15,9 +20,10 @@ class Document
   # All tokens have a reference to the original text and its offset in the
   # string for locating it easily.
   #
-  def tokens
+  def tokens_from_analyzer
     Enumerator.new do |yielder|
       cur_off = 0
+      @analyzer ||= {}
       @analyzer[:token] ||= FreeLing::Analyzer.new(@text, :output_format => :token)
       @analyzer[:token].tokens.each do |token|
         token.text = @text
@@ -44,11 +50,12 @@ class Document
   # contracted words (e.g. "he's" => "he is"), changing the original text.
   # An exception is raised if this happens.
   #
-  def tagged_tokens
+  def tagged_tokens_from_analyzer
     Enumerator.new do |yielder|
       # FIXME do not convert to array, use the internal iterator
       st = self.tokens.to_a
       cur_st = 0
+      @analyzer ||= {}
       @analyzer[:tagged] ||= FreeLing::Analyzer.new(@text, :output_format => :tagged)
       @analyzer[:tagged].tokens.each do |token|
         token.text = @text
@@ -78,4 +85,5 @@ class Document
       end
     end
   end
+=end
 end
