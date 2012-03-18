@@ -1,13 +1,19 @@
+require 'document'
+
 class Token
   include Mongoid::Document
 
-  field :form, :type => String
-  field :tag,  :type => String
-  field :pos,  :type => Integer
+  field :form,  :type => String
+  field :lemma, :type => String
+  field :tag,   :type => String
+  field :prob,  :type => Float
+  field :pos,   :type => Integer
 
   belongs_to :document
+  belongs_to :named_entity
 
-  CLASSES_PER_TAG = {
+
+  NE_CLASSES_PER_TAG = {
     'NP00O00' => :organizations,
     'NP00V00' => :others,
     'NP00SP0' => :people,
@@ -18,11 +24,11 @@ class Token
 
 
   def named_entity?
-    CLASSES_PER_TAG.has_key?(tag) if tag
+    NE_CLASSES_PER_TAG.has_key?(tag) if tag
   end
 
-  def class
-    CLASSES_PER_TAG[tag] if tag
+  def ne_class
+    NE_CLASSES_PER_TAG[tag] if tag
   end
 
 =begin

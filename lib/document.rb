@@ -1,44 +1,56 @@
 require 'freeling/analyzer'
+require 'token'
+require 'named_entity'
 
 class Document
   include Mongoid::Document
 
   field :text, :type => String
 
-  has_many :tokens
+  has_many    :tokens, :dependent => :delete
   embeds_many :named_entities
 
-=begin
-  def named_entities
-  end
 
   def analyze
+    self.tokens.destroy_all
+    self.tokens.clear
+    self.tokens = []
+    tokens_from_analyzer.each do |token|
+      self.tokens << token
+      token.save
+    end
+
+    self.named_entities.destroy_all
+    self.named_entities.clear
+    self.named_entities = []
+    named_entities_from_analyzer(self.tokens).each do |named_entity|
+      self.named_entities << named_entity
+    end
   end
 
-  # Return an array of tokens.
+
+private
+  # Return an enumerator of tokens
   #
-  # All tokens have a reference to the original text and its offset in the
+  # All tokens have a reference to the original text and its position in the
   # string for locating it easily.
   #
   def tokens_from_analyzer
     Enumerator.new do |yielder|
-      cur_off = 0
-      @analyzer ||= {}
-      @analyzer[:token] ||= FreeLing::Analyzer.new(@text, :output_format => :token)
-      @analyzer[:token].tokens.each do |token|
-        token.text = @text
-        # FIXME replace String#index for something supported by IO objects
-        token.offset = @text.index(token.form, cur_off)
-        cur_off = token.offset + token.form.size
-        yielder << token
+      pos = 0
+      analyzer = FreeLing::Analyzer.new(text, :output_format => :token)
+      analyzer.tokens.each do |token|
+        token_pos = text.index(token[:form], pos)
+        yielder << Token.new(token.merge(:pos => token_pos))
+        pos = token_pos + token[:form].size
       end
     end
   end
 
-  # Return an array of tagged tokens.
+  # Return an enumerator of named entities
   #
-  # All tokens have a reference to the original text and its offset in the
-  # string for locating it easily.
+  # Each named entity will reference the original token, so this method accepts
+  # an array of known tokens as a parameter for this purpose.
   #
   # NOTE This function works correctly *only if* the following FreeLing
   # config options are reset:
@@ -50,40 +62,51 @@ class Document
   # contracted words (e.g. "he's" => "he is"), changing the original text.
   # An exception is raised if this happens.
   #
-  def tagged_tokens_from_analyzer
+  def named_entities_from_analyzer(tokens=nil)
     Enumerator.new do |yielder|
-      # FIXME do not convert to array, use the internal iterator
-      st = self.tokens.to_a
+      # FIXME use the internal iterator instead of a counter (cur_st)
+      st = (tokens || self.tokens_from_analyzer).to_a
       cur_st = 0
-      @analyzer ||= {}
-      @analyzer[:tagged] ||= FreeLing::Analyzer.new(@text, :output_format => :tagged)
-      @analyzer[:tagged].tokens.each do |token|
-        token.text = @text
+      analyzer = FreeLing::Analyzer.new(text, :output_format => :tagged)
+      analyzer.tokens.each do |token|
 
         # exact match
-        if st[cur_st].form == token.form
-          token.offset = st[cur_st].offset
+        if token[:form] == st[cur_st].form
+          if Token::NE_CLASSES_PER_TAG[token[:tag]]
+            yielder << NamedEntity.new(token.merge({
+              :ne_class => st[cur_st].ne_class,
+              :pos => st[cur_st].pos,
+              :tokens => [st[cur_st]],
+            }))
+          end
           cur_st += 1
-          yielder << token
+
         # multiword
         # e.g. John Doe ==> tokens        = ["John", "Doe"]
         #                   tagged_tokens = ["John_Doe"]
-        elsif token.form =~ /^#{st[cur_st].form}_/
-          token.offset = st[cur_st].offset
-          token.words = {}
-          m_word = token.form.dup
+        elsif token[:form] =~ /^#{st[cur_st].form}_/
+          token_pos = st[cur_st].pos
+          tokens = []
+          m_word = token[:form].dup
           while not m_word.empty? and m_word.start_with?(st[cur_st].form)
-            token.words[st[cur_st].offset] = st[cur_st].form
+            tokens << st[cur_st]
             m_word = m_word.slice(st[cur_st].form.size + 1 .. -1).to_s
             cur_st += 1
           end
-          yielder << token
+          if Token::NE_CLASSES_PER_TAG[token[:tag]]
+            yielder << NamedEntity.new(token.merge({
+              :ne_class => Token::NE_CLASSES_PER_TAG[token[:tag]],
+              :pos => token_pos,
+              :tokens => tokens,
+            }))
+          end
+
         else
           raise "Simple tokens and tagged tokens do not match " \
-                "(#{st[cur_st]} != #{token}). Maybe a contraction?"
+                "(#{st[cur_st].form} != #{token[:form]}). Maybe a contraction?"
         end
       end
     end
   end
-=end
+
 end

@@ -13,7 +13,6 @@ Mongoid.logger = Logger.new($stdout)
 $LOAD_PATH << './lib'
 
 require 'document'
-require 'token'
 
 DOCUMENTS_PATH = File.join(settings.public_folder, 'docs')
 

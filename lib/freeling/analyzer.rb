@@ -1,19 +1,15 @@
 require 'open3'
-
-require 'analyzer'
 require 'token'
 
 ENV['FREELINGSHARE'] = '/usr/local/share/freeling'
 
 
 module FreeLing
-
   class Analyzer
     attr_reader :document, :last_error
 
     DEFAULT_CONFIG_PATH = '/usr/local/share/freeling/config/es.cfg'
     DEFAULT_ANALYZE_PATH = '/usr/local/bin/analyzer'
-    #DEFAULT_ANALYZE_PATH = '/home/munshkr/src/freeling-3.0-alfa1/src/main/analyzer'
 
     NotRunningError     = Class.new(StandardError)
     AnalyzerError       = Class.new(StandardError)
@@ -157,7 +153,7 @@ module FreeLing
           if line.empty?
             yielder << nil
           else
-            yielder << new_token_from_line(line)
+            yielder << parse_token_line(line)
           end
         end
 
@@ -167,17 +163,13 @@ module FreeLing
       end
     end
 
-    def new_token_from_line(str)
+    def parse_token_line(str)
       form, lemma, tag, prob = str.split(' ')[0..3]
-      metadata = {
+      { :form => form,
         :lemma => lemma,
         :tag => tag,
-        :prob => prob
+        :prob => prob,
       }.reject {|k, v| v.nil?}
-      metadata = nil if metadata.empty?
-
-      Token.new(form, :metadata => metadata)
     end
   end
-
 end
