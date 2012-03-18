@@ -10,6 +10,8 @@ class Document
   has_many    :tokens, :dependent => :delete
   embeds_many :named_entities
 
+  after_save :save_tokens
+
 
   def analyze
     self.tokens.destroy_all
@@ -17,7 +19,6 @@ class Document
     self.tokens = []
     tokens_from_analyzer.each do |token|
       self.tokens << token
-      token.save
     end
 
     self.named_entities.destroy_all
@@ -106,6 +107,13 @@ private
                 "(#{st[cur_st].form} != #{token[:form]}). Maybe a contraction?"
         end
       end
+    end
+  end
+
+protected
+  def save_tokens
+    self.tokens.each do |token|
+      token.save
     end
   end
 
