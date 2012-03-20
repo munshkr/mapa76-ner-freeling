@@ -25,7 +25,7 @@ helpers do
     html = ''
     cur = 0
     document.tagged_tokens.each do |token|
-      html << document.text[cur ... token.offset]
+      html << document.content[cur ... token.offset]
       token_class = 'tk'
       token_class << " ne #{token.class}" if token.named_entity? or token.date?
       html << content_tag(:span, token.orig_form, :class => token_class)

@@ -5,7 +5,7 @@ require 'named_entity'
 class Document
   include Mongoid::Document
 
-  field :text, :type => String
+  field :content, :type => String
   field :last_analysis, :type => Time
 
   has_many    :tokens, :dependent => :delete
@@ -46,9 +46,9 @@ private
   def tokens_from_analyzer
     Enumerator.new do |yielder|
       pos = 0
-      analyzer = FreeLing::Analyzer.new(text, :output_format => :token)
+      analyzer = FreeLing::Analyzer.new(content, :output_format => :token)
       analyzer.tokens.each do |token|
-        token_pos = text.index(token[:form], pos)
+        token_pos = content.index(token[:form], pos)
         yielder << Token.new(token.merge(:pos => token_pos))
         pos = token_pos + token[:form].size
       end
@@ -75,7 +75,7 @@ private
       # FIXME use the internal iterator instead of a counter (cur_st)
       st = (tokens || self.tokens_from_analyzer).to_a
       cur_st = 0
-      analyzer = FreeLing::Analyzer.new(text, :output_format => :tagged)
+      analyzer = FreeLing::Analyzer.new(content, :output_format => :tagged)
       analyzer.tokens.each do |token|
 
         # exact match

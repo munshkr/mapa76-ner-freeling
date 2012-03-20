@@ -28,6 +28,6 @@ class Token
   end
 
   def original_text
-    document.text[pos ... pos + form.size]
+    document.content[pos ... pos + form.size]
   end
 end
