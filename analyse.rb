@@ -17,11 +17,11 @@ require 'document'
 DOCUMENTS_PATH = File.join(settings.public_folder, 'docs')
 
 
-
 helpers do
   register Padrino::Helpers
 
   def tagged_document_html(document)
+=begin
     html = ''
     cur = 0
     document.tagged_tokens.each do |token|
@@ -32,6 +32,8 @@ helpers do
       cur = token.offset + token.form.size
     end
     simple_format(html)
+=end
+    simple_format(document.content)
   end
 end
 
@@ -44,7 +46,19 @@ get '/' do
 end
 
 get '/analyse' do
-  @document = Document.new(open(File.join(DOCUMENTS_PATH, params[:f])).read)
+  @document = Document.find_or_initialize_by(:filename => params[:f])
+  if @document.new?
+    @document.content = open(File.join(DOCUMENTS_PATH, params[:f])).read
+    @document.save
+  end
+  if not @document.analyzed?
+    @document.analyze!
+    @document.save
+  end
+
+  @tokens = @document.tokens
+  @named_entities = @document.named_entities
+
   erb :analyse
 end
 

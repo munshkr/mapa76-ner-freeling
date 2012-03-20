@@ -5,7 +5,8 @@ require 'named_entity'
 class Document
   include Mongoid::Document
 
-  field :content, :type => String
+  field :content,       :type => String
+  field :filename,      :type => String
   field :last_analysis, :type => Time
 
   has_many    :tokens, :dependent => :delete
@@ -19,6 +20,10 @@ class Document
   end
 
   def analyze
+    analyze! if not analyzed?
+  end
+
+  def analyze!
     self.tokens.destroy_all
     self.tokens.clear
     self.tokens = []
