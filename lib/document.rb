@@ -24,14 +24,12 @@ class Document
     self.last_analysis = Time.now
   end
 
-
-private
   # Return an enumerator of tokens
   #
   # All tokens have a reference to the original text and its position in the
   # string for locating it easily.
   #
-  def tokens_from_analyzer
+  def tokens
     Enumerator.new do |yielder|
       pos = 0
       analyzer = FreeLing::Analyzer.new(content, :output_format => :token)
@@ -43,10 +41,9 @@ private
     end
   end
 
+
+private
   # Return an enumerator of named entities
-  #
-  # Each named entity will reference the original token, so this method accepts
-  # an array of known tokens as a parameter for this purpose.
   #
   # NOTE This function works correctly *only if* the following FreeLing
   # config options are reset:
@@ -58,10 +55,10 @@ private
   # contracted words (e.g. "he's" => "he is"), changing the original text.
   # An exception is raised if this happens.
   #
-  def named_entities_from_analyzer(tokens=nil)
+  def named_entities_from_analyzer
     Enumerator.new do |yielder|
       # FIXME use the internal iterator instead of a counter (cur_st)
-      st = (tokens || tokens_from_analyzer).to_a
+      st = self.tokens.to_a
       cur_st = 0
       analyzer = FreeLing::Analyzer.new(content, :output_format => :tagged)
       analyzer.tokens.each do |token|

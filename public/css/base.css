@@ -6,7 +6,7 @@ body {
   line-height: 28px;
   font-size: 14px;
 }
-.tk {
+.tk, .ne {
   cursor: pointer;
   padding: 3px 4px;
   margin: 0 -3px;
@@ -17,6 +17,14 @@ body {
 .tk:hover {
   color: #000;
   background-color: #eee;
+}
+.ne:hover {
+  color: #fff
+  background-color: inherit;
+}
+.ne:hover .tk:hover {
+  color: inherit;
+  background-color: inherit;
 }
 .ne {
   color: white;
@@ -35,14 +43,18 @@ body {
   color: black;
   background-color: yellow;
 }
-.ne.date {
+.ne.dates {
   background-color: green;
 }
 
 .block {
   display: inline-block;
-  width: 8px;
-  height: 10px;
+  width: 10px;
+  height: 4px;
+  margin: 0 2px;
+  border-radius: 3px;
+  -moz-border-radius: 3px;
+  -webkit-border-radius: 3px;
 }
 
 ul.inline {

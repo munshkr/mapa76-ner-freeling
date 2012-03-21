@@ -21,19 +21,26 @@ helpers do
   register Padrino::Helpers
 
   def tagged_document_html(document)
-=begin
+    tokens_per_pos = Hash[document.tokens.map { |token|
+      [token[:pos], token.merge(:html => content_tag(:span, token[:form], :class => 'tk'))]
+    }]
+
+    document.named_entities.each do |ne|
+      first = ne.tokens.min {|a,b| a['pos'] <=> b['pos']}
+      last  = ne.tokens.max {|a,b| a['pos'] <=> b['pos']}
+      # TODO Raise exception if cant find token with named entity's position
+      tokens_per_pos[first['pos']][:html] = "<span class=\"ne #{ne.ne_class}\">" + tokens_per_pos[first['pos']][:html]
+      tokens_per_pos[last['pos']][:html] << "</span>"
+    end
+
     html = ''
-    cur = 0
-    document.tagged_tokens.each do |token|
-      html << document.content[cur ... token.offset]
-      token_class = 'tk'
-      token_class << " ne #{token.class}" if token.named_entity? or token.date?
-      html << content_tag(:span, token.orig_form, :class => token_class)
-      cur = token.offset + token.form.size
+    cur_pos = 0
+    tokens_per_pos.each do |token_pos, token|
+      html << document.content[cur_pos ... token_pos]
+      html << token[:html]
+      cur_pos = token_pos + token[:form].size
     end
     simple_format(html)
-=end
-    simple_format(document.content)
   end
 end
 
