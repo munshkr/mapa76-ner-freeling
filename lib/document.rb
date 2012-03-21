@@ -1,5 +1,4 @@
 require 'freeling/analyzer'
-require 'token'
 require 'named_entity'
 
 class Document
@@ -9,10 +8,7 @@ class Document
   field :filename,      :type => String
   field :last_analysis, :type => Time
 
-  has_many    :tokens, :dependent => :delete
   embeds_many :named_entities
-
-  after_save :save_tokens
 
 
   def analyzed?
@@ -24,20 +20,7 @@ class Document
   end
 
   def analyze!
-    self.tokens.destroy_all
-    self.tokens.clear
-    self.tokens = []
-    tokens_from_analyzer.each do |token|
-      self.tokens << token
-    end
-
-    self.named_entities.destroy_all
-    self.named_entities.clear
-    self.named_entities = []
-    named_entities_from_analyzer(self.tokens).each do |named_entity|
-      self.named_entities << named_entity
-    end
-
+    self.named_entities = named_entities_from_analyzer.to_a
     self.last_analysis = Time.now
   end
 
@@ -54,7 +37,7 @@ private
       analyzer = FreeLing::Analyzer.new(content, :output_format => :token)
       analyzer.tokens.each do |token|
         token_pos = content.index(token[:form], pos)
-        yielder << Token.new(token.merge(:pos => token_pos))
+        yielder << token.merge(:pos => token_pos)
         pos = token_pos + token[:form].size
       end
     end
@@ -78,18 +61,17 @@ private
   def named_entities_from_analyzer(tokens=nil)
     Enumerator.new do |yielder|
       # FIXME use the internal iterator instead of a counter (cur_st)
-      st = (tokens || self.tokens_from_analyzer).to_a
+      st = (tokens || tokens_from_analyzer).to_a
       cur_st = 0
       analyzer = FreeLing::Analyzer.new(content, :output_format => :tagged)
       analyzer.tokens.each do |token|
 
         # exact match
-        if token[:form] == st[cur_st].form
-          if Token.named_entity?(token)
+        if token[:form] == st[cur_st][:form]
+          if NamedEntity::CLASSES_PER_TAG[token[:tag]]
             yielder << NamedEntity.new(token.merge({
-              :ne_class => st[cur_st].named_entity_class,
-              :pos => st[cur_st].pos,
-              :tokens => [st[cur_st]],
+              :pos => st[cur_st][:pos],
+              :tokens => [{ :pos => st[cur_st][:pos], :form => st[cur_st][:form] }],
             }))
           end
           cur_st += 1
@@ -97,18 +79,18 @@ private
         # multiword
         # e.g. John Doe ==> tokens        = ["John", "Doe"]
         #                   tagged_tokens = ["John_Doe"]
-        elsif token[:form] =~ /^#{st[cur_st].form}_/
-          token_pos = st[cur_st].pos
+        elsif token[:form] =~ /^#{st[cur_st][:form]}_/
+          token_pos = st[cur_st][:pos]
           tokens = []
           m_word = token[:form].dup
-          while not m_word.empty? and m_word.start_with?(st[cur_st].form)
-            tokens << st[cur_st]
-            m_word = m_word.slice(st[cur_st].form.size + 1 .. -1).to_s
+          while not m_word.empty? and m_word.start_with?(st[cur_st][:form])
+            tokens << { :pos => st[cur_st][:pos], :form => st[cur_st][:form] }
+            m_word = m_word.slice(st[cur_st][:form].size + 1 .. -1).to_s
             cur_st += 1
           end
-          if Token.named_entity?(token)
+          if ne_class = NamedEntity::CLASSES_PER_TAG[token[:tag]]
             yielder << NamedEntity.new(token.merge({
-              :ne_class => Token.named_entity_class(token),
+              :ne_class => ne_class,
               :pos => token_pos,
               :tokens => tokens,
             }))
@@ -116,16 +98,9 @@ private
 
         else
           raise "Simple tokens and tagged tokens do not match " \
-                "(#{st[cur_st].form} != #{token[:form]}). Maybe a contraction?"
+                "(#{st[cur_st][:form]} != #{token[:form]}). Maybe a contraction?"
         end
       end
-    end
-  end
-
-protected
-  def save_tokens
-    self.tokens.each do |token|
-      token.save
     end
   end
 

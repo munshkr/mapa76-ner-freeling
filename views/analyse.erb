@@ -18,17 +18,3 @@
   <%= tagged_document_html(@document) %>
 </article>
 <% end %>
-
-<div>
-  <h3>Tokens</h3>
-  <% @tokens.each do |token| %>
-    <span><%= token.form %></span>
-  <% end %>
-</div>
-
-<div>
-  <h3>Named Entities</h3>
-  <% @named_entities.each do |named_entity| %>
-    <span><%= named_entity.form %></span>
-  <% end %>
-</div>

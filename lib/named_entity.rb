@@ -1,5 +1,4 @@
 require 'document'
-require 'token'
 
 class NamedEntity
   include Mongoid::Document
@@ -10,9 +9,9 @@ class NamedEntity
   field :lemma,    :type => String
   field :tag,      :type => String
   field :prob,     :type => Float
+  field :tokens,   :type => Array
 
   embedded_in :document
-  has_many    :tokens
 
 
   CLASSES_PER_TAG = {
@@ -27,4 +26,5 @@ class NamedEntity
   def original_text
     document.content[pos ... pos + form.size]
   end
+
 end

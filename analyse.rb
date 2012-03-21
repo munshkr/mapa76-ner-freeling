@@ -47,7 +47,7 @@ end
 
 get '/analyse' do
   @document = Document.find_or_initialize_by(:filename => params[:f])
-  if @document.new?
+  if @document.new_record?
     @document.content = open(File.join(DOCUMENTS_PATH, params[:f])).read
     @document.save
   end
@@ -56,7 +56,6 @@ get '/analyse' do
     @document.save
   end
 
-  @tokens = @document.tokens
   @named_entities = @document.named_entities
 
   erb :analyse

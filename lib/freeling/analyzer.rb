@@ -1,5 +1,4 @@
 require 'open3'
-require 'token'
 
 ENV['FREELINGSHARE'] = '/usr/local/share/freeling'
 
