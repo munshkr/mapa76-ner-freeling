@@ -1,10 +1,12 @@
 development:
   host: localhost
   database: mapa76_munshkr_development
+  logger: false
 
 test:
   host: localhost
   database: mapa76_munshkr_test
+  logger: false
 
 # set these environment variables on your prod server
 production:
@@ -13,6 +15,7 @@ production:
   username: <%= ENV['MONGOID_USERNAME'] %>
   password: <%= ENV['MONGOID_PASSWORD'] %>
   database: <%= ENV['MONGOID_DATABASE'] %>
+  logger: false
   # slaves:
   #   - host: slave1.local
   #     port: 27018
