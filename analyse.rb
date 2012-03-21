@@ -22,7 +22,7 @@ helpers do
 
   def tagged_document_html(document)
     tokens_per_pos = Hash[document.tokens.map { |token|
-      [token[:pos], token.merge(:html => content_tag(:span, token[:form], :class => 'tk'))]
+      [token[:pos], token.merge(:html => content_tag(:span, token[:form], :class => 'tk', 'data-pos' => token[:pos]))]
     }]
 
     document.named_entities.each do |ne|
