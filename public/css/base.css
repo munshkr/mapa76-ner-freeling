@@ -5,6 +5,9 @@ body {
 .tokens p {
   line-height: 28px;
   font-size: 14px;
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
 }
 .tk, .ne {
   cursor: pointer;
