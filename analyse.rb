@@ -40,6 +40,7 @@ helpers do
       html << token[:html]
       cur_pos = token_pos + token[:form].size
     end
+
     simple_format(html)
   end
 end
