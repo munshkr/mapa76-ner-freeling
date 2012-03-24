@@ -17,6 +17,7 @@ body {
   -moz-border-radius: 3px;
   -webkit-border-radius: 3px;
 }
+/*
 .tk:hover {
   color: #000;
   background-color: #eee;
@@ -29,6 +30,7 @@ body {
   color: inherit;
   background-color: inherit;
 }
+*/
 .ne {
   color: white;
   background-color: gray;
@@ -70,4 +72,20 @@ ul.inline li {
 
 aside {
   margin: 30px 0;
+}
+
+.selection {
+  position: absolute;
+  border: 1px solid #89B;
+  background: #BCE;
+  background-color: #BEC;
+  border-color: #8B9;
+}
+.active {
+  color: #000;
+  background-color: #8f8;
+}
+.dropped {
+  color: #000;
+  background-color: #f88;
 }
